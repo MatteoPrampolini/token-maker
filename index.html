@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8"/>
@@ -32,11 +33,12 @@
 	  margin-top:0px;
 	  }
 	  a{
-		margin-left:30px;
+		float:right;
+		margin-right:20px;
 	  }
     </style>
   </head>
-  <body style="overflow-y:hidden">
+  <body style="">
 	<div id="container">
 		<!-- blocco 1-->
 		<div id="blocco1" class="block" style="display: inline-block;">
@@ -46,16 +48,19 @@
 			<input type="button" value="Browse..." onclick="document.getElementById('uploadBtn').click();" />
 			<input id="uploadBtn" type="file" style="display: none;">
 			<input id="clearBtn" type="button" value="Clear"/>
-			<input id="doneBtn" type="button" value="Done" style="margin-left:90px;width:60px;"/>
+			<input id="changeRingFileBtn" type="file" style="display: none;">
+			<input id="changeRing" type="button" value="Change Ring" onclick="document.getElementById('changeRingFileBtn').click();"/>
+			<input id="doneBtn" type="button" value="Done" style=";width:60px;"/>
 		  </div>
 		</div>
 		<!--My tokens-->
 		<div id="tokenDiv">
 			<h3>Tokens</h3>
-			<ul id="linkList">
+			<ul id="linkList" style="width:100%">
 			
 			</ul>
 		</div>
+		<a href="https://github.com/MatteoPrampolini?tab=repositories" target="_blank">my github</a>
 	</div>
     <!-- blocco 2-->
     <div id="blocco2" class="block">
@@ -72,26 +77,23 @@
       //ON LOAD CREA PEDINA
       $(document).ready(function() {
         createPedina();
-        $("#blocco2").invisible();
-      }
-                       );
+		$("#blocco2").invisible();
+      });
+	  
       function createPedina(){
         fabric.util.loadImage('pedina.png', function (img) {
           pedina = new fabric.Image(img, {
             selectable: false,
             scaleX: canvas.width / img.width,
             scaleY: canvas.height / img.height
-          }
-                                   );
+          });
           canvas.centerObject(pedina);
           canvas.add(pedina);
           canvas.renderAll();
-        }
-                             );
+        });
       }
       //ON UPLOAD
       document.getElementById('uploadBtn').onchange = function handleImage(e) {
-		$('#clearBtn').trigger('click');
         var reader = new FileReader();
         reader.onload = function (event){
           var imgObj = new Image();
@@ -105,15 +107,36 @@
               opacity: 0.4,
               scaleY: canvas.height / image.width,
               scaleX: canvas.width / image.width
-            }
-                     );
+            });
             canvas.centerObject(image);
             canvas.add(image);
             canvas.renderAll();
           }
         }
-        reader.readAsDataURL(e.target.files[0]);
+         reader.readAsDataURL(e.target.files[e.target.files.length-1]);
       }
+	  document.getElementById("changeRingFileBtn").onchange = function handleImage(e) {
+		canvas.clear();
+        pedina=null;
+        image=null;
+		var reader = new FileReader();
+        reader.onload = function (event){
+          var imgObj = new Image();
+          imgObj.src = event.target.result;
+          imgObj.onload = function () {
+            pedina = new fabric.Image(imgObj);
+            pedina.set({
+				selectable: false,
+				scaleX: canvas.width / imgObj.width,
+				scaleY: canvas.height / imgObj.height
+            });
+          canvas.centerObject(pedina);
+		  canvas.add(pedina);
+          canvas.renderAll();
+          }
+        }
+        reader.readAsDataURL(e.target.files[e.target.files.length-1]);
+	  }
       //DONE
       $("#doneBtn").click(function(){
         image.opacity=1;
@@ -129,8 +152,7 @@
           height: 280,
           quality: 1.0,
           multiplier: 2.0,
-        }
-                                         );
+        });
         CreateCroppie(strDataURI);
       }
                          );
@@ -161,16 +183,26 @@
 						});
       }
       //CLEAR
+		
       $("#clearBtn").click(function(){
         canvas.clear();
-        pedina=null;
+
         image=null;
-        createPedina();
-      }
-                          );
+		canvas.centerObject(pedina);
+		canvas.add(pedina);
+        canvas.renderAll();
+
+      });
 	function getImage() {
 		
 		let name=$("#uploadBtn").val().split("fakepath")[1].slice(1);
+		let split = name.split('.');
+		let filename = split[0];
+		var extension = split[1];
+		if (filename.length > 10) {
+			filename = filename.substring(0, 18)+"[...]";
+		}
+		name = filename +"."+extension;
 		$("#linkList").append("<li>"+name+"</li>");
 		$('.resultImg').croppie('result', {
           type: 'base64',
@@ -180,7 +212,7 @@
           quality: 1
         }
         ).then(function(croppedbase64) {
-	   
+			//resizedataURL(croppedbase64, 560, 560,"aa");
 			string64toBlob(croppedbase64);
 		});
 	}
@@ -204,7 +236,6 @@
                              );
         const blobUrl = URL.createObjectURL(blob);
 		$("#linkList").children('li').last().append("<a target='_blank' href='"+blobUrl+"'>"+"[download]"+"</a>");
-        //window.open(blobUrl, '_blank');
       }
       (function($) {
         $.fn.invisible = function() {
@@ -221,27 +252,7 @@
         };
       }
        (jQuery));
-function resizedataURL(datas, wantedWidth, wantedHeight,text)
-    {
-        var img = document.createElement('img');
-
-        img.onload = function()
-            {        
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-
-                canvas.width = wantedWidth;
-                canvas.height = wantedHeight;
-
-                ctx.drawImage(this, 0, 0, wantedWidth, wantedHeight);
-
-                var dataURI = canvas.toDataURL();
-				//window.open(dataURI);
-				$("#linkList").children('li').last().append("<a target='_blank' href='"+dataURI+"'>"+text+"</a>");
-            };
-
-        img.src = datas;
-    }
+	   
     </script>
   </body>
 </html>
