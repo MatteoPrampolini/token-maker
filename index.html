@@ -1,258 +1,254 @@
+
+
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="croppie.css" />
-    <script src="jquery-3.6.0.min.js">
-    </script> 
-    <script type="text/javascript" src="fabric.min.js">
-    </script>
-    <link rel="shortcut icon" href="#" />
-    <script src="croppie.js">
-    </script>
-    <style>
-      .block{
-        width:300px;
-        height:350px;
-      }
-	  #container{
-	  width:700px;
-	  background-color: #D3D3D3;
-	  }
-	  #tokenDiv{
-		display: inline-block;
-		margin-top:0px;
-		vertical-align:top;
-		width:300px;
-	  }
-	  h3{
-	  margin-left:50px;
-	  text-align:center;
-	  width:100%;
-	  font-size:20px;
-	  margin-top:0px;
-	  }
-	  a{
-		float:right;
-		margin-right:20px;
-	  }
-    </style>
-  </head>
-  <body style="">
-	<div id="container">
-		<!-- blocco 1-->
-		<div id="blocco1" class="block" style="display: inline-block;">
-		  <canvas id="c1" width="280" height="280" style="border:5px solid black;">
-		  </canvas>
-		  <div style="width:100%;margin-top:20px;">
-			<input type="button" value="Browse..." onclick="document.getElementById('uploadBtn').click();" />
-			<input id="uploadBtn" type="file" style="display: none;">
-			<input id="clearBtn" type="button" value="Clear"/>
-			<input id="changeRingFileBtn" type="file" style="display: none;">
-			<input id="changeRing" type="button" value="Change Ring" onclick="document.getElementById('changeRingFileBtn').click();"/>
-			<input id="doneBtn" type="button" value="Done" style=";width:60px;"/>
-		  </div>
+	<head>
+		<meta charset="UTF-8"/>
+		<link rel="stylesheet" href="croppie.css" />
+		<script src="jquery-3.6.0.min.js"></script> 
+		<script type="text/javascript" src="fabric.min.js"></script>
+		<link rel="shortcut icon" href="#"/>
+		<script src="croppie.js"></script>
+		<style>
+			.block{
+			width:300px;
+			height:350px;
+			}
+			#container{
+			width:700px;
+			background-color: #D3D3D3;
+			}
+			#tokenDiv{
+			display: inline-block;
+			margin-top:0px;
+			vertical-align:top;
+			width:300px;
+			}
+			h3{
+			margin-left:50px;
+			text-align:center;
+			width:100%;
+			font-size:20px;
+			margin-top:0px;
+			}
+			a{
+			float:right;
+			margin-right:20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div id="content" class="block" style="display: inline-block;">
+				<canvas id="c1" width="280" height="280" style="border:5px solid black;">
+				</canvas>
+				<div style="width:100%;margin-top:20px;">
+					<input type="button" value="Browse..." onclick="document.getElementById('uploadBtn').click();" />
+					<input id="uploadBtn" type="file" style="display: none;">
+					<input id="clearBtn" type="button" value="Clear"/>
+					<input id="changeRingFileBtn" type="file" style="display: none;">
+					<input id="changeRing" type="button" value="Change Ring" onclick="document.getElementById('changeRingFileBtn').click();"/>
+					<input id="doneBtn" type="button" value="Done" style="width:60px;"/>
+				</div>
+			</div>
+			<!--My tokens-->
+			<div id="tokenDiv">
+				<h3>Tokens</h3>
+				<ul id="linkList" style="width:100%"></ul>
+			</div>
+			<a href="https://github.com/MatteoPrampolini?tab=repositories" target="_blank">my github</a>
 		</div>
-		<!--My tokens-->
-		<div id="tokenDiv">
-			<h3>Tokens</h3>
-			<ul id="linkList" style="width:100%">
+		<!-- blocco 2-->
+		<div id="hidden_image_div" class="block">
+			<div class="resultImg" style="width: 560px;height: 560px;">
+			</div>
+		</div>
+		<script>
+			var canvas = new fabric.Canvas('c1');
+			canvas.setHeight(280);
+			canvas.setWidth(280);
+			var image; //uploaded image
+			var ring; //red ring image
+			var hiddenImage=null; //final image, which will be saved in resultImg
+			$(document).ready(function() {
+			  drawRing();
+			$("#hidden_image_div").invisible();
+			});
 			
-			</ul>
-		</div>
-		<a href="https://github.com/MatteoPrampolini?tab=repositories" target="_blank">my github</a>
-	</div>
-    <!-- blocco 2-->
-    <div id="blocco2" class="block">
-      <div class="resultImg" style="width: 560px;height: 560px;">
-      </div>
-    </div>
-    <script>
-      var canvas = new fabric.Canvas('c1');
-      canvas.setHeight(280);
-      canvas.setWidth(280);
-      var pedina;
-      var image;
-      var basic=null;
-      //ON LOAD CREA PEDINA
-      $(document).ready(function() {
-        createPedina();
-		$("#blocco2").invisible();
-      });
-	  
-      function createPedina(){
-        fabric.util.loadImage('pedina.png', function (img) {
-          pedina = new fabric.Image(img, {
-            selectable: false,
-            scaleX: canvas.width / img.width,
-            scaleY: canvas.height / img.height
-          });
-          canvas.centerObject(pedina);
-          canvas.add(pedina);
-          canvas.renderAll();
-        });
-      }
-      //ON UPLOAD
-      document.getElementById('uploadBtn').onchange = function handleImage(e) {
-        var reader = new FileReader();
-        reader.onload = function (event){
-          var imgObj = new Image();
-          imgObj.src = event.target.result;
-          imgObj.onload = function () {
-            image = new fabric.Image(imgObj);
-            image.set({
-              angle: 0,
-              padding: 10,
-              cornersize:10,
-              opacity: 0.4,
-              scaleY: canvas.height / image.width,
-              scaleX: canvas.width / image.width
-            });
-            canvas.centerObject(image);
-            canvas.add(image);
-            canvas.renderAll();
-          }
-        }
-         reader.readAsDataURL(e.target.files[e.target.files.length-1]);
-      }
-	  document.getElementById("changeRingFileBtn").onchange = function handleImage(e) {
-		canvas.clear();
-        pedina=null;
-        image=null;
-		var reader = new FileReader();
-        reader.onload = function (event){
-          var imgObj = new Image();
-          imgObj.src = event.target.result;
-          imgObj.onload = function () {
-            pedina = new fabric.Image(imgObj);
-            pedina.set({
-				selectable: false,
-				scaleX: canvas.width / imgObj.width,
-				scaleY: canvas.height / imgObj.height
-            });
-          canvas.centerObject(pedina);
-		  canvas.add(pedina);
-          canvas.renderAll();
-          }
-        }
-        reader.readAsDataURL(e.target.files[e.target.files.length-1]);
-	  }
-      //DONE
-      $("#doneBtn").click(function(){
-        image.opacity=1;
-        window.canvas.remove(1);
-        canvas.centerObject(pedina);
-        canvas.add(pedina);
-        canvas.renderAll();
-        canvas.discardActiveObject();
-        canvas.renderAll();
-        let strDataURI = canvas.toDataURL({
-          format: 'png',
-          width: 280,
-          height: 280,
-          quality: 1.0,
-          multiplier: 2.0,
-        });
-        CreateCroppie(strDataURI);
-      }
-                         );
-      //Create croppie canvas. after that call getImage
-      function CreateCroppie(ImgUrl){
-        //alert("favij");
-        $('.resultImg').croppie('destroy');
-        basic = $('.resultImg').croppie({
-          viewport: {
-            width: 560,
-            height: 560,
-            type: 'circle',
-            viewport: 'original'
-          }
-          ,
-          showZoomer:false,
-          mouseWheelZoom: false,
-          enableResize: false
-        }
-                                       );
-        basic.croppie('bind', {
-          url: ImgUrl,
-          points: [5,5,549,549]
-        }
-                     ).then(function(results){
-	
-						getImage();
-						});
-      }
-      //CLEAR
-		
-      $("#clearBtn").click(function(){
-        canvas.clear();
-
-        image=null;
-		canvas.centerObject(pedina);
-		canvas.add(pedina);
-        canvas.renderAll();
-
-      });
-	function getImage() {
-		
-		let name=$("#uploadBtn").val().split("fakepath")[1].slice(1);
-		let split = name.split('.');
-		let filename = split[0];
-		var extension = split[1];
-		if (filename.length > 10) {
+			function drawRing(){
+			  fabric.util.loadImage('ring.png', function (img) {
+				ring = new fabric.Image(img, {
+				  selectable: false,
+				  scaleX: canvas.width / img.width,
+				  scaleY: canvas.height / img.height
+				});
+				canvas.centerObject(ring);
+				canvas.add(ring);
+				canvas.renderAll();
+			  });
+			}
+			//ON UPLOAD
+			document.getElementById('uploadBtn').onchange = function handleImage(e) {
+			  var reader = new FileReader();
+			  reader.onload = function (event){
+				var imgObj = new Image();
+				imgObj.src = event.target.result;
+				imgObj.onload = function () {
+				  image = new fabric.Image(imgObj);
+				  image.set({
+					angle: 0,
+					padding: 10,
+					cornersize:10,
+					opacity: 0.4,
+					scaleY: canvas.height / image.width,
+					scaleX: canvas.width / image.width
+				  });
+				  canvas.centerObject(image);
+				  canvas.add(image);
+				  canvas.renderAll();
+				}
+			  }
+			   reader.readAsDataURL(e.target.files[e.target.files.length-1]);
+			}
+			document.getElementById("changeRingFileBtn").onchange = function handleImage(e) {
+			canvas.clear();
+			  ring=null;
+			  image=null;
+			var reader = new FileReader();
+			  reader.onload = function (event){
+				var imgObj = new Image();
+				imgObj.src = event.target.result;
+				imgObj.onload = function () {
+				  ring = new fabric.Image(imgObj);
+				  ring.set({
+			selectable: false,
+			scaleX: canvas.width / imgObj.width,
+			scaleY: canvas.height / imgObj.height
+				  });
+				canvas.centerObject(ring);
+			canvas.add(ring);
+				canvas.renderAll();
+				}
+			  }
+			  reader.readAsDataURL(e.target.files[e.target.files.length-1]);
+			}
+			//DONE
+			//create a final squared image and call roundImage to round it.
+			$("#doneBtn").click(function(){
+			  image.opacity=1;1
+			  window.canvas.remove(1);
+			  canvas.centerObject(ring);
+			  canvas.add(ring);
+			  canvas.renderAll();
+			  canvas.discardActiveObject();
+			  canvas.renderAll();
+			  let strDataURI = canvas.toDataURL({
+				format: 'png',
+				width: 280,
+				height: 280,
+				quality: 1.0,
+				multiplier: 2.0,
+			  });
+			  roundImage(strDataURI);
+			}
+							   );
+			//Create croppie canvas. after that call createLink
+			function roundImage(ImgUrl){
+			  $('.resultImg').croppie('destroy');
+			  hiddenImage = $('.resultImg').croppie({
+				viewport: {
+				  width: 560,
+				  height: 560,
+				  type: 'circle',
+				  viewport: 'original'
+				}
+				,
+				showZoomer:false,
+				mouseWheelZoom: false,
+				enableResize: false
+			  }
+											 );
+			  //cut image
+			  hiddenImage.croppie('bind', {
+				url: ImgUrl,
+				points: [5,5,549,549]
+			  }
+						   ).then(function(results){
+			
+			createLink();
+			});
+			}
+			//CLEAR
+			$("#clearBtn").click(function(){
+			  canvas.clear();
+			
+			  image=null;
+			canvas.centerObject(ring);
+			canvas.add(ring);
+			  canvas.renderAll();
+			
+			});
+			//creates a link to the final image, which is blobbed in the browser.
+			function createLink() {
+			
+			let name=$("#uploadBtn").val().split("fakepath")[1].slice(1);
+			let split = name.split('.');
+			let filename = split[0];
+			var extension = split[1];
+			if (filename.length > 10) {
 			filename = filename.substring(0, 18)+"[...]";
-		}
-		name = filename +"."+extension;
-		$("#linkList").append("<li>"+name+"</li>");
-		$('.resultImg').croppie('result', {
-          type: 'base64',
-          format: 'png',
-          size:  'viewport',
-          circle: true,
-          quality: 1
-        }
-        ).then(function(croppedbase64) {
-			//resizedataURL(croppedbase64, 560, 560,"aa");
+			}
+			name = filename +"."+extension;
+			$("#linkList").append("<li>"+name+"</li>");
+			$('.resultImg').croppie('result', {
+				type: 'base64',
+				format: 'png',
+				size:  'viewport',
+				circle: true,
+				quality: 1
+			  }
+			  ).then(function(croppedbase64) {
 			string64toBlob(croppedbase64);
-		});
-	}
-	  
-      function string64toBlob(croppedbase64){
-        const base64ImageData = croppedbase64;
-        const contentType = 'image/png';
-        const byteCharacters = atob(base64ImageData.substr(`data:${contentType};base64,`.length));
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-          const slice = byteCharacters.slice(offset, offset + 1024);
-          const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          byteArrays.push(byteArray);
-        }
-        const blob = new Blob(byteArrays, {
-          type: contentType}
-                             );
-        const blobUrl = URL.createObjectURL(blob);
-		$("#linkList").children('li').last().append("<a target='_blank' href='"+blobUrl+"'>"+"[download]"+"</a>");
-      }
-      (function($) {
-        $.fn.invisible = function() {
-          return this.each(function() {
-            $(this).css("visibility", "hidden");
-          }
-                          );
-        };
-        $.fn.visible = function() {
-          return this.each(function() {
-            $(this).css("visibility", "visible");
-          }
-                          );
-        };
-      }
-       (jQuery));
-	   
-    </script>
-  </body>
+			});
+			}
+			
+			function string64toBlob(croppedbase64){
+			  const base64ImageData = croppedbase64;
+			  const contentType = 'image/png';
+			  const byteCharacters = atob(base64ImageData.substr(`data:${contentType};base64,`.length));
+			  const byteArrays = [];
+			  for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+				const slice = byteCharacters.slice(offset, offset + 1024);
+				const byteNumbers = new Array(slice.length);
+				for (let i = 0; i < slice.length; i++) {
+				  byteNumbers[i] = slice.charCodeAt(i);
+				}
+				const byteArray = new Uint8Array(byteNumbers);
+				byteArrays.push(byteArray);
+			  }
+			  const blob = new Blob(byteArrays, {
+				type: contentType}
+								   );
+			  const blobUrl = URL.createObjectURL(blob);
+			$("#linkList").children('li').last().append("<a target='_blank' href='"+blobUrl+"'>"+"[download]"+"</a>");
+			}
+			(function($) {
+			  $.fn.invisible = function() {
+				return this.each(function() {
+				  $(this).css("visibility", "hidden");
+				}
+								);
+			  };
+			  $.fn.visible = function() {
+				return this.each(function() {
+				  $(this).css("visibility", "visible");
+				}
+								);
+			  };
+			}
+			 (jQuery));
+			
+		</script>
+	</body>
 </html>
+
